@@ -1,9 +1,4 @@
 {
   "version": 2,
-  "routes": [
-    { "src": "/upgrade", "dest": "/pro.html" },
-    { "src": "/privacy", "dest": "/privacy.html" },
-    { "src": "/api/(.*)", "dest": "/api/$1" },
-    { "src": "/", "dest": "/index.html" }
-  ]
+  "cleanUrls": true
 }
