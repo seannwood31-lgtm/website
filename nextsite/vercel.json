@@ -1,0 +1,8 @@
+{
+  "version": 2,
+  "rewrites": [
+    { "source": "/pro", "destination": "/public/pro.html" },
+    { "source": "/privacy", "destination": "/public/privacy.html" },
+    { "source": "/", "destination": "/public/index.html" }
+  ]
+}
