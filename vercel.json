@@ -1,12 +1,12 @@
 {
   "version": 2,
-  "routes": [
-    { "src": "/pro", "dest": "/public/pro.html" },
-    { "src": "/privacy", "dest": "/public/privacy.html" },
-    { "src": "/success", "dest": "/api/success" },
-    { "src": "/create-checkout", "dest": "/api/create-checkout" },
-    { "src": "/webhook", "dest": "/api/webhook" },
-    { "src": "/verify", "dest": "/api/verify" },
-    { "src": "/", "dest": "/public/index.html" }
+  "rewrites": [
+    { "source": "/pro", "destination": "/public/pro.html" },
+    { "source": "/privacy", "destination": "/public/privacy.html" },
+    { "source": "/success", "destination": "/api/success" },
+    { "source": "/create-checkout", "destination": "/api/create-checkout" },
+    { "source": "/webhook", "destination": "/api/webhook" },
+    { "source": "/verify", "destination": "/api/verify" },
+    { "source": "/", "destination": "/public/index.html" }
   ]
 }
