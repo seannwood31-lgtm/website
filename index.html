@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sportsbook Tab Lock — One Tab Per Book</title>
+<meta name="description" content="Stop drowning in sportsbook tabs. Tab Lock automatically assigns one tab per sportsbook — keeping your betting workflow fast and organized.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #060609;
+    --surface: #0f0f16;
+    --surface2: #18181f;
+    --border: #24242f;
+    --accent: #ff4d00;
+    --accent2: #ff7a3d;
+    --text: #ededf5;
+    --muted: #64647a;
+    --green: #00e676;
+    --radius: 10px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Barlow', sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* ── Background texture ── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background-image:
+      linear-gradient(rgba(255,77,0,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,77,0,0.025) 1px, transparent 1px);
+    background-size: 48px 48px;
+  }
+
+  /* ── Nav ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(6,6,9,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 48px;
+    height: 64px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .nav-logo {
+    display: flex; align-items: center; gap: 12px;
+    text-decoration: none;
+  }
+  .logo-box {
+    width: 34px; height: 34px;
+    background: var(--accent); border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900; font-size: 12px; color: #fff; letter-spacing: 0.5px;
+  }
+  .logo-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700; font-size: 20px; color: var(--text);
+  }
+  .nav-links { display: flex; align-items: center; gap: 32px; }
+  .nav-link {
+    color: var(--muted); font-size: 14px; font-weight: 500;
+    text-decoration: none; transition: color 0.15s;
+  }
+  .nav-link:hover { color: var(--text); }
+  .nav-cta {
+    background: var(--accent); color: #fff;
+    padding: 8px 20px; border-radius: 6px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700; font-size: 14px; letter-spacing: 0.5px;
+    text-decoration: none; transition: background 0.15s;
+  }
+  .nav-cta:hover { background: var(--accent2); }
+
+  /* ── Hero ── */
+  .hero {
+    position: relative; z-index: 1;
+    min-height: 100vh;
+    display: flex; align-items: center;
+    padding: 120px 48px 80px;
+    max-width: 1200px; margin: 0 auto;
+    gap: 80px;
+  }
+  .hero-left { flex: 1; }
+  .hero-eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(255,77,0,0.08);
+    border: 1px solid rgba(255,77,0,0.2);
+    color: var(--accent2); padding: 6px 14px; border-radius: 20px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px; font-weight: 700; letter-spacing: 2px;
+    text-transform: uppercase; margin-bottom: 28px;
+  }
+  .hero-eyebrow span { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; }
+  h1 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 88px; font-weight: 900;
+    line-height: 0.88; letter-spacing: -2px;
+    text-transform: uppercase;
+    margin-bottom: 32px;
+  }
+  h1 em { color: var(--accent); font-style: normal; }
+  .hero-desc {
+    font-size: 19px; color: var(--muted); line-height: 1.65;
+    max-width: 480px; margin-bottom: 44px; font-weight: 300;
+  }
+  .hero-desc strong { color: var(--text); font-weight: 600; }
+  .hero-actions { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .btn-primary {
+    background: var(--accent); color: #fff;
+    padding: 14px 28px; border-radius: 8px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900; font-size: 16px; letter-spacing: 1px;
+    text-decoration: none; text-transform: uppercase;
+    transition: all 0.15s; display: inline-block;
+    box-shadow: 0 0 40px rgba(255,77,0,0.25);
+  }
+  .btn-primary:hover { background: var(--accent2); transform: translateY(-1px); box-shadow: 0 0 60px rgba(255,77,0,0.35); }
+  .btn-ghost {
+    color: var(--muted); font-size: 15px; font-weight: 500;
+    text-decoration: none; display: flex; align-items: center; gap: 6px;
+    transition: color 0.15s;
+  }
+  .btn-ghost:hover { color: var(--text); }
+  .hero-stat {
+    font-size: 13px; color: var(--muted);
+    display: flex; align-items: center; gap: 6px; margin-top: 32px;
+  }
+  .hero-stat::before { content: ''; width: 24px; height: 1px; background: var(--border); display: block; }
+
+  /* Hero right — animated browser */
+  .hero-right { flex-shrink: 0; position: relative; }
+  .browser-frame {
+    width: 420px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px; overflow: hidden;
+    box-shadow: 0 60px 120px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,77,0,0.06);
+    position: relative;
+  }
+  .browser-frame::before {
+    content: '';
+    position: absolute; inset: -1px;
+    background: linear-gradient(135deg, rgba(255,77,0,0.15), transparent 50%);
+    border-radius: 14px; pointer-events: none;
+  }
+  .bf-bar {
+    background: var(--surface2); border-bottom: 1px solid var(--border);
+    padding: 12px 16px; display: flex; align-items: center; gap: 8px;
+  }
+  .bf-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .bf-url {
+    flex: 1; background: var(--bg); border: 1px solid var(--border);
+    border-radius: 5px; padding: 5px 10px;
+    font-size: 11px; color: var(--muted); margin-left: 8px;
+  }
+  .bf-tabs {
+    background: var(--surface2); border-bottom: 1px solid var(--border);
+    padding: 6px 8px; display: flex; gap: 5px;
+  }
+  .bf-tab {
+    padding: 4px 10px; border-radius: 4px;
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 11px;
+    display: flex; align-items: center; gap: 5px; white-space: nowrap;
+  }
+  .bf-tab.active { background: var(--bg); color: var(--text); border: 1px solid var(--border); }
+  .bf-tab.dim { color: var(--muted); }
+  .bf-tab-dot { width: 7px; height: 7px; border-radius: 50%; }
+  .bf-content { padding: 20px; }
+
+  /* Popup inside browser */
+  .popup-inner {
+    background: #13131a; border: 1px solid #2a2a38;
+    border-radius: 10px; overflow: hidden; width: 100%;
+  }
+  .pi-head {
+    background: #13131a; border-bottom: 1px solid #2a2a38;
+    padding: 12px 14px; display: flex; align-items: center; gap: 8px;
+  }
+  .pi-logo {
+    width: 26px; height: 26px; background: var(--accent); border-radius: 5px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 10px; color: #fff;
+  }
+  .pi-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 14px; }
+  .pi-sub { font-size: 10px; color: var(--muted); }
+  .pi-rows { padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; }
+  .pi-row {
+    display: flex; align-items: center; gap: 8px;
+    background: #1c1c26; border: 1px solid #2a2a38;
+    border-radius: 5px; padding: 7px 10px;
+  }
+  .pi-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+  .pi-name { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 13px; flex: 1; }
+  .pi-badge {
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 10px;
+    letter-spacing: 0.5px; padding: 2px 6px; border-radius: 3px;
+  }
+  .pi-badge.locked { background: rgba(0,230,118,0.1); color: #00e676; border: 1px solid rgba(0,230,118,0.25); }
+
+  /* Floating glow */
+  .hero-glow {
+    position: absolute; width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(255,77,0,0.12) 0%, transparent 70%);
+    top: -100px; right: -100px; pointer-events: none;
+  }
+
+  /* ── Section shared ── */
+  section { position: relative; z-index: 1; }
+  .section-inner { max-width: 1200px; margin: 0 auto; padding: 100px 48px; }
+  .section-eyebrow {
+    font-family: 'Barlow Condensed', sans-serif; font-size: 12px; font-weight: 700;
+    letter-spacing: 3px; text-transform: uppercase; color: var(--accent);
+    display: flex; align-items: center; gap: 10px; margin-bottom: 16px;
+  }
+  .section-eyebrow::before { content: ''; width: 24px; height: 2px; background: var(--accent); display: block; }
+  h2 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 56px; font-weight: 900;
+    text-transform: uppercase; line-height: 0.92;
+    letter-spacing: -1px; margin-bottom: 20px;
+  }
+  h2 em { color: var(--accent); font-style: normal; }
+
+  /* ── How it works ── */
+  .how-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 20px; margin-top: 60px;
+  }
+  .how-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 28px;
+    position: relative; overflow: hidden;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .how-card:hover { border-color: rgba(255,77,0,0.3); transform: translateY(-3px); }
+  .how-card::before {
+    content: attr(data-num);
+    position: absolute; top: -10px; right: 20px;
+    font-family: 'Barlow Condensed', sans-serif; font-size: 80px; font-weight: 900;
+    color: rgba(255,77,0,0.05); line-height: 1; pointer-events: none;
+  }
+  .how-icon { font-size: 28px; margin-bottom: 16px; }
+  .how-title {
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 20px;
+    margin-bottom: 10px; color: var(--text);
+  }
+  .how-desc { font-size: 14px; color: var(--muted); line-height: 1.65; }
+
+  /* ── Features ── */
+  .features-section { background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .features-layout {
+    display: flex; gap: 80px; align-items: center;
+  }
+  .features-list-wrap { flex: 1; }
+  .features-list { display: flex; flex-direction: column; gap: 6px; margin-top: 40px; }
+  .feat-item {
+    display: flex; gap: 16px; align-items: flex-start;
+    padding: 18px 20px; border-radius: 8px; cursor: default;
+    border: 1px solid transparent; transition: all 0.2s;
+  }
+  .feat-item:hover, .feat-item.active {
+    background: var(--surface2); border-color: var(--border);
+  }
+  .feat-item.active .feat-item-title { color: var(--accent); }
+  .feat-icon-wrap {
+    width: 40px; height: 40px; border-radius: 8px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 18px;
+    background: rgba(255,77,0,0.08); border: 1px solid rgba(255,77,0,0.15);
+  }
+  .feat-item-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 17px; margin-bottom: 4px; }
+  .feat-item-desc { font-size: 13px; color: var(--muted); line-height: 1.5; }
+
+  .features-visual { flex-shrink: 0; width: 380px; }
+  .fv-card {
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 20px;
+    box-shadow: 0 40px 80px rgba(0,0,0,0.5);
+  }
+
+  /* ── Sportsbooks ── */
+  .books-section {}
+  .books-grid {
+    display: grid; grid-template-columns: repeat(5, 1fr);
+    gap: 10px; margin-top: 48px;
+  }
+  .book-chip {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; padding: 14px 12px;
+    display: flex; align-items: center; gap: 10px;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .book-chip:hover { transform: translateY(-2px); }
+  .book-chip-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .book-chip-name { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 14px; }
+
+  /* ── Pricing CTA ── */
+  .pricing-section {}
+  .pricing-inner { text-align: center; }
+  .pricing-card {
+    display: inline-block; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 16px;
+    padding: 48px 56px; margin-top: 48px;
+    position: relative; overflow: hidden;
+    box-shadow: 0 40px 80px rgba(0,0,0,0.4);
+  }
+  .pricing-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+  }
+  .pricing-card::after {
+    content: '';
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(255,77,0,0.05) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .pc-free {
+    display: inline-block; background: rgba(107,107,122,0.15);
+    border: 1px solid var(--border); color: var(--muted);
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 11px;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    padding: 4px 12px; border-radius: 4px; margin-bottom: 20px;
+  }
+  .pc-price {
+    font-family: 'Barlow Condensed', sans-serif; font-size: 80px; font-weight: 900;
+    line-height: 1; margin-bottom: 4px;
+  }
+  .pc-price sup { font-size: 32px; vertical-align: super; }
+  .pc-period { color: var(--muted); font-size: 16px; margin-bottom: 36px; }
+  .pc-features { list-style: none; margin-bottom: 36px; display: flex; flex-direction: column; gap: 12px; text-align: left; min-width: 320px; }
+  .pc-features li { display: flex; align-items: center; gap: 10px; font-size: 15px; }
+  .pc-check { color: var(--green); font-size: 14px; }
+  .pc-free-badge {
+    font-size: 11px; color: var(--muted); background: var(--surface2);
+    border: 1px solid var(--border); padding: 1px 8px; border-radius: 10px; margin-left: auto;
+  }
+  .pc-pro-badge {
+    font-size: 10px; color: var(--accent); background: rgba(255,77,0,0.1);
+    border: 1px solid rgba(255,77,0,0.2); padding: 1px 7px; border-radius: 10px; margin-left: auto;
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 700; letter-spacing: 0.5px;
+  }
+  .pc-btn {
+    display: block; width: 100%; padding: 16px;
+    background: var(--accent); color: #fff; border: none;
+    border-radius: 10px; cursor: pointer; text-decoration: none;
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 900;
+    font-size: 18px; letter-spacing: 1px; text-transform: uppercase;
+    transition: all 0.15s; text-align: center;
+    box-shadow: 0 0 40px rgba(255,77,0,0.3);
+  }
+  .pc-btn:hover { background: var(--accent2); box-shadow: 0 0 60px rgba(255,77,0,0.4); }
+  .pc-note { font-size: 12px; color: var(--muted); margin-top: 14px; }
+
+  /* ── FAQ ── */
+  .faq-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 48px; }
+  .faq-item {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 24px;
+  }
+  .faq-q { font-weight: 600; font-size: 15px; margin-bottom: 8px; }
+  .faq-a { font-size: 14px; color: var(--muted); line-height: 1.65; }
+
+  /* ── Footer ── */
+  footer {
+    position: relative; z-index: 1;
+    border-top: 1px solid var(--border);
+    padding: 40px 48px;
+    display: flex; align-items: center; justify-content: space-between;
+    max-width: 1200px; margin: 0 auto;
+  }
+  .footer-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+  .footer-tagline { font-size: 13px; color: var(--muted); }
+  .footer-links { display: flex; gap: 24px; }
+  .footer-link { color: var(--muted); font-size: 13px; text-decoration: none; transition: color 0.15s; }
+  .footer-link:hover { color: var(--text); }
+
+  /* ── Animations ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .fade-up { animation: fadeUp 0.6s ease both; }
+  .delay-1 { animation-delay: 0.1s; }
+  .delay-2 { animation-delay: 0.2s; }
+  .delay-3 { animation-delay: 0.3s; }
+  .delay-4 { animation-delay: 0.4s; }
+
+  @media (max-width: 900px) {
+    nav { padding: 0 24px; }
+    .nav-links { display: none; }
+    .hero { flex-direction: column; padding: 100px 24px 60px; gap: 48px; }
+    h1 { font-size: 56px; }
+    .hero-right { width: 100%; }
+    .browser-frame { width: 100%; }
+    .how-grid { grid-template-columns: 1fr; }
+    .features-layout { flex-direction: column; }
+    .features-visual { width: 100%; }
+    .books-grid { grid-template-columns: repeat(2, 1fr); }
+    .faq-grid { grid-template-columns: 1fr; }
+    .section-inner { padding: 60px 24px; }
+    footer { flex-direction: column; gap: 24px; text-align: center; padding: 32px 24px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="/" class="nav-logo">
+    <div class="logo-box">STL</div>
+    <div class="logo-name">Tab Lock</div>
+  </a>
+  <div class="nav-links">
+    <a href="#how" class="nav-link">How It Works</a>
+    <a href="#features" class="nav-link">Features</a>
+    <a href="#books" class="nav-link">Sportsbooks</a>
+    <a href="/pro" class="nav-link">Pro</a>
+    <a href="https://chromewebstore.google.com" target="_blank" class="nav-cta">Add to Chrome — Free</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div style="position:relative;overflow:hidden;">
+  <div class="hero-glow" style="position:absolute;top:-50px;right:-50px;z-index:0;pointer-events:none;
+    width:600px;height:600px;background:radial-gradient(circle,rgba(255,77,0,0.1) 0%,transparent 70%)"></div>
+  <div class="hero" style="position:relative;z-index:1;">
+    <div class="hero-left">
+      <div class="hero-eyebrow fade-up"><span></span>Chrome Extension</div>
+      <h1 class="fade-up delay-1">One<br>Tab.<br><em>One</em><br>Book.</h1>
+      <p class="hero-desc fade-up delay-2">
+        Stop drowning in duplicate sportsbook tabs. Tab Lock <strong>automatically assigns one tab per sportsbook</strong> — so your betting workflow stays fast, clean, and organized.
+      </p>
+      <div class="hero-actions fade-up delay-3">
+        <a href="https://chromewebstore.google.com" target="_blank" class="btn-primary">Add to Chrome — Free</a>
+        <a href="#how" class="btn-ghost">See how it works →</a>
+      </div>
+      <p class="hero-stat fade-up delay-4">Works with 14 major sportsbooks · No setup required</p>
+    </div>
+
+    <div class="hero-right fade-up delay-2">
+      <div class="browser-frame">
+        <div class="bf-bar">
+          <div class="bf-dot" style="background:#ff5f57"></div>
+          <div class="bf-dot" style="background:#febc2e"></div>
+          <div class="bf-dot" style="background:#28c840"></div>
+          <div class="bf-url">draftkings.com/sportsbook</div>
+        </div>
+        <div class="bf-tabs">
+          <div class="bf-tab active"><div class="bf-tab-dot" style="background:#00b14f"></div>DraftKings</div>
+          <div class="bf-tab dim"><div class="bf-tab-dot" style="background:#1493ff"></div>FanDuel</div>
+          <div class="bf-tab dim"><div class="bf-tab-dot" style="background:#ffb800"></div>BetMGM</div>
+          <div class="bf-tab dim"><div class="bf-tab-dot" style="background:#0077cc"></div>Caesars</div>
+        </div>
+        <div class="bf-content">
+          <div class="popup-inner">
+            <div class="pi-head">
+              <div class="pi-logo">STL</div>
+              <div>
+                <div class="pi-title">Tab Lock</div>
+                <div class="pi-sub">One book per tab — no clutter</div>
+              </div>
+            </div>
+            <div class="pi-rows">
+              <div class="pi-row">
+                <div class="pi-dot" style="background:#00b14f"></div>
+                <div class="pi-name">DraftKings</div>
+                <div class="pi-badge locked">LOCKED</div>
+              </div>
+              <div class="pi-row">
+                <div class="pi-dot" style="background:#1493ff"></div>
+                <div class="pi-name">FanDuel</div>
+                <div class="pi-badge locked">LOCKED</div>
+              </div>
+              <div class="pi-row">
+                <div class="pi-dot" style="background:#ffb800"></div>
+                <div class="pi-name">BetMGM</div>
+                <div class="pi-badge locked">LOCKED</div>
+              </div>
+              <div class="pi-row">
+                <div class="pi-dot" style="background:#0077cc"></div>
+                <div class="pi-name">Caesars</div>
+                <div class="pi-badge locked">LOCKED</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<section id="how">
+  <div class="section-inner">
+    <div class="section-eyebrow">How It Works</div>
+    <h2>Dead simple.<br><em>Automatic.</em></h2>
+    <div class="how-grid">
+      <div class="how-card" data-num="01">
+        <div class="how-icon">📥</div>
+        <div class="how-title">Install the Extension</div>
+        <div class="how-desc">Add Tab Lock to Chrome in one click. No account required, no configuration needed to get started.</div>
+      </div>
+      <div class="how-card" data-num="02">
+        <div class="how-icon">🌐</div>
+        <div class="how-title">Navigate to Any Sportsbook</div>
+        <div class="how-desc">Visit DraftKings, FanDuel, BetMGM — any supported book. Tab Lock detects it and automatically locks that tab to that sportsbook.</div>
+      </div>
+      <div class="how-card" data-num="03">
+        <div class="how-icon">🔒</div>
+        <div class="how-title">Stay Organized Automatically</div>
+        <div class="how-desc">Every book gets one tab, forever. Navigate away and Tab Lock redirects back. Open a new book and it gets its own tab — no duplicates, no clutter.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features" class="features-section">
+  <div class="section-inner">
+    <div class="features-layout">
+      <div class="features-list-wrap">
+        <div class="section-eyebrow">Features</div>
+        <h2>Built for<br><em>serious</em><br>bettors.</h2>
+        <div class="features-list">
+          <div class="feat-item active">
+            <div class="feat-icon-wrap">🔒</div>
+            <div>
+              <div class="feat-item-title">Auto Tab Locking</div>
+              <div class="feat-item-desc">Navigate to any supported sportsbook and that tab is instantly locked. No buttons, no setup — it just works.</div>
+            </div>
+          </div>
+          <div class="feat-item">
+            <div class="feat-icon-wrap">🎨</div>
+            <div>
+              <div class="feat-item-title">Color-Coded Badges</div>
+              <div class="feat-item-desc">Each sportsbook gets a unique color badge in your Chrome toolbar so you always know which book is where at a glance.</div>
+            </div>
+          </div>
+          <div class="feat-item">
+            <div class="feat-icon-wrap">🔄</div>
+            <div>
+              <div class="feat-item-title">Auto-Refresh <span style="color:var(--accent);font-size:11px;font-family:'Barlow Condensed',sans-serif;font-weight:700;background:rgba(255,77,0,0.1);border:1px solid rgba(255,77,0,0.2);padding:1px 6px;border-radius:3px;margin-left:4px;">PRO</span></div>
+              <div class="feat-item-desc">Set refresh intervals per sportsbook — from 1 to 60 minutes — so your odds are always live when lines move.</div>
+            </div>
+          </div>
+          <div class="feat-item">
+            <div class="feat-icon-wrap">💾</div>
+            <div>
+              <div class="feat-item-title">Session Restore <span style="color:var(--accent);font-size:11px;font-family:'Barlow Condensed',sans-serif;font-weight:700;background:rgba(255,77,0,0.1);border:1px solid rgba(255,77,0,0.2);padding:1px 6px;border-radius:3px;margin-left:4px;">PRO</span></div>
+              <div class="feat-item-desc">Save your entire sportsbook layout and restore it with one click after restarting Chrome. Never rebuild your setup again.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="features-visual">
+        <div class="fv-card">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:12px;">All Locked Books</div>
+          <div style="display:flex;flex-direction:column;gap:7px;">
+            <div style="display:flex;align-items:center;gap:10px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:9px 12px;">
+              <div style="width:8px;height:8px;border-radius:50%;background:#00b14f;flex-shrink:0"></div>
+              <div style="flex:1;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;">DraftKings</div>
+              <div style="font-size:10px;color:var(--muted);">Tab 1</div>
+              <div style="background:rgba(0,230,118,0.1);color:#00e676;border:1px solid rgba(0,230,118,0.25);font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:10px;letter-spacing:0.5px;padding:2px 6px;border-radius:3px;">LOCKED</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:9px 12px;">
+              <div style="width:8px;height:8px;border-radius:50%;background:#1493ff;flex-shrink:0"></div>
+              <div style="flex:1;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;">FanDuel</div>
+              <div style="font-size:10px;color:var(--muted);">Tab 2</div>
+              <div style="background:rgba(0,230,118,0.1);color:#00e676;border:1px solid rgba(0,230,118,0.25);font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:10px;letter-spacing:0.5px;padding:2px 6px;border-radius:3px;">LOCKED</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:9px 12px;">
+              <div style="width:8px;height:8px;border-radius:50%;background:#ffb800;flex-shrink:0"></div>
+              <div style="flex:1;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;">BetMGM</div>
+              <div style="font-size:10px;color:var(--muted);">Tab 3</div>
+              <div style="background:rgba(0,230,118,0.1);color:#00e676;border:1px solid rgba(0,230,118,0.25);font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:10px;letter-spacing:0.5px;padding:2px 6px;border-radius:3px;">LOCKED</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:9px 12px;">
+              <div style="width:8px;height:8px;border-radius:50%;background:#0077cc;flex-shrink:0"></div>
+              <div style="flex:1;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;">Caesars</div>
+              <div style="font-size:10px;color:var(--muted);">Tab 4</div>
+              <div style="background:rgba(0,230,118,0.1);color:#00e676;border:1px solid rgba(0,230,118,0.25);font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:10px;letter-spacing:0.5px;padding:2px 6px;border-radius:3px;">LOCKED</div>
+            </div>
+          </div>
+          <div style="margin-top:10px;display:flex;gap:6px;">
+            <div style="flex:1;background:rgba(0,230,118,0.08);border:1px solid rgba(0,230,118,0.2);color:#00e676;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;padding:7px;text-align:center;border-radius:6px;">↻ Refresh All</div>
+            <div style="flex:1;background:rgba(77,184,255,0.08);border:1px solid rgba(77,184,255,0.2);color:#4db8ff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;padding:7px;text-align:center;border-radius:6px;">💾 Save Session</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SPORTSBOOKS -->
+<section id="books">
+  <div class="section-inner">
+    <div class="section-eyebrow">Supported Books</div>
+    <h2>All the <em>major</em><br>sportsbooks.</h2>
+    <div class="books-grid">
+      <div class="book-chip" style="border-color:rgba(0,177,79,0.2)"><div class="book-chip-dot" style="background:#00b14f"></div><div class="book-chip-name">DraftKings</div></div>
+      <div class="book-chip" style="border-color:rgba(20,147,255,0.2)"><div class="book-chip-dot" style="background:#1493ff"></div><div class="book-chip-name">FanDuel</div></div>
+      <div class="book-chip" style="border-color:rgba(255,184,0,0.2)"><div class="book-chip-dot" style="background:#ffb800"></div><div class="book-chip-name">BetMGM</div></div>
+      <div class="book-chip" style="border-color:rgba(0,119,204,0.2)"><div class="book-chip-dot" style="background:#0077cc"></div><div class="book-chip-name">Caesars</div></div>
+      <div class="book-chip" style="border-color:rgba(232,0,30,0.2)"><div class="book-chip-dot" style="background:#e8001e"></div><div class="book-chip-name">ESPN Bet</div></div>
+      <div class="book-chip" style="border-color:rgba(204,0,0,0.2)"><div class="book-chip-dot" style="background:#cc0000"></div><div class="book-chip-name">PointsBet</div></div>
+      <div class="book-chip" style="border-color:rgba(33,150,243,0.2)"><div class="book-chip-dot" style="background:#2196f3"></div><div class="book-chip-name">BetRivers</div></div>
+      <div class="book-chip" style="border-color:rgba(255,107,0,0.2)"><div class="book-chip-dot" style="background:#ff6b00"></div><div class="book-chip-name">Hard Rock Bet</div></div>
+      <div class="book-chip" style="border-color:rgba(0,127,62,0.2)"><div class="book-chip-dot" style="background:#007f3e"></div><div class="book-chip-name">Bet365</div></div>
+      <div class="book-chip" style="border-color:rgba(232,19,43,0.2)"><div class="book-chip-dot" style="background:#e8132b"></div><div class="book-chip-name">Fanatics</div></div>
+      <div class="book-chip" style="border-color:rgba(123,45,139,0.2)"><div class="book-chip-dot" style="background:#7b2d8b"></div><div class="book-chip-name">WynnBet</div></div>
+      <div class="book-chip" style="border-color:rgba(0,73,144,0.2)"><div class="book-chip-dot" style="background:#004990"></div><div class="book-chip-name">SuperBook</div></div>
+      <div class="book-chip" style="border-color:rgba(0,188,212,0.2)"><div class="book-chip-dot" style="background:#00bcd4"></div><div class="book-chip-name">Fliff</div></div>
+      <div class="book-chip" style="border-color:rgba(255,77,0,0.3)"><div class="book-chip-dot" style="background:#ff4d00"></div><div class="book-chip-name">SmartStake</div></div>
+      <div class="book-chip" style="border-color:var(--border);opacity:0.5"><div class="book-chip-dot" style="background:var(--muted)"></div><div class="book-chip-name" style="color:var(--muted)">More soon...</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING CTA -->
+<section class="pricing-section" style="background:var(--surface);border-top:1px solid var(--border);">
+  <div class="section-inner">
+    <div class="pricing-inner">
+      <div class="section-eyebrow" style="justify-content:center">Pricing</div>
+      <h2>Start free.<br><em>Go Pro</em> for $2.99.</h2>
+      <div class="pricing-card">
+        <div class="pc-free">Free to install</div>
+        <div class="pc-price"><sup>$</sup>2.99</div>
+        <div class="pc-period">/ month for Pro · Cancel anytime</div>
+        <ul class="pc-features">
+          <li><span class="pc-check">✓</span> Tab locking (up to 4 books) <span class="pc-free-badge">FREE</span></li>
+          <li><span class="pc-check">✓</span> Color-coded tab badges <span class="pc-free-badge">FREE</span></li>
+          <li><span class="pc-check">✓</span> Unlimited sportsbook locking <span class="pc-pro-badge">PRO</span></li>
+          <li><span class="pc-check">✓</span> Auto-refresh per sportsbook <span class="pc-pro-badge">PRO</span></li>
+          <li><span class="pc-check">✓</span> Session save &amp; restore <span class="pc-pro-badge">PRO</span></li>
+          <li><span class="pc-check">✓</span> All future features <span class="pc-pro-badge">PRO</span></li>
+        </ul>
+        <a href="/pro" class="pc-btn">Get Pro — $2.99/mo</a>
+        <p class="pc-note">🔒 Secure payment via Stripe · Instant activation</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section>
+  <div class="section-inner">
+    <div class="section-eyebrow">FAQ</div>
+    <h2>Common<br><em>questions.</em></h2>
+    <div class="faq-grid">
+      <div class="faq-item">
+        <div class="faq-q">Does it work automatically?</div>
+        <div class="faq-a">Yes — just navigate to any supported sportsbook. Tab Lock detects it and locks that tab instantly. No buttons, no setup.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">What happens if I navigate away from a sportsbook?</div>
+        <div class="faq-a">Tab Lock redirects the tab back to its assigned sportsbook. If you want to free a tab, just click "Clear" in the popup.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Is the basic version really free?</div>
+        <div class="faq-a">Yes, completely free — lock up to 4 sportsbooks with no time limit. Pro unlocks unlimited books, auto-refresh, and session restore.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">How do I activate Pro after subscribing?</div>
+        <div class="faq-a">After payment you'll get a license key. Paste it into the Tab Lock extension popup under Settings → Pro License and click Activate.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Does it work with SmartStake?</div>
+        <div class="faq-a">Yes — SmartStake is fully supported and Tab Lock is optimized for SmartStake's one-click betting workflow.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Can I cancel Pro anytime?</div>
+        <div class="faq-a">Absolutely. Cancel through the Stripe customer portal at any time. Your Pro features stay active until the end of your billing period.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<div style="border-top:1px solid var(--border);position:relative;z-index:1;">
+  <footer>
+    <a href="/" class="footer-logo">
+      <div class="logo-box" style="width:28px;height:28px;font-size:10px">STL</div>
+      <span style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:16px;color:var(--text)">Tab Lock</span>
+    </a>
+    <div class="footer-tagline">One tab per sportsbook. Always.</div>
+    <div class="footer-links">
+      <a href="/pro" class="footer-link">Pro</a>
+      <a href="https://chromewebstore.google.com" target="_blank" class="footer-link">Chrome Store</a>
+    </div>
+  </footer>
+</div>
+
+</body>
+</html>
