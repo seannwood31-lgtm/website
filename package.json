@@ -1,9 +1,0 @@
-{
-  "name": "evtablock-site",
-  "version": "1.0.0",
-  "description": "Sportsbook Tab Lock website + subscription backend",
-  "dependencies": {
-    "@vercel/kv": "^1.0.0",
-    "stripe": "^14.0.0"
-  }
-}
