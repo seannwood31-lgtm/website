@@ -1,8 +1,9 @@
 {
   "version": 2,
-  "rewrites": [
-    { "source": "/pro", "destination": "/public/pro.html" },
-    { "source": "/privacy", "destination": "/public/privacy.html" },
-    { "source": "/", "destination": "/public/index.html" }
+  "routes": [
+    { "src": "/pro", "dest": "/pro.html" },
+    { "src": "/privacy", "dest": "/privacy.html" },
+    { "src": "/api/(.*)", "dest": "/api/$1" },
+    { "src": "/", "dest": "/index.html" }
   ]
 }
