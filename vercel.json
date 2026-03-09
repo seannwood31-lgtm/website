@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "rewrites": [
+    { "source": "/pro", "destination": "/public/pro.html" },
+    { "source": "/privacy", "destination": "/public/privacy.html" },
+    { "source": "/success", "destination": "/api/success" },
+    { "source": "/create-checkout", "destination": "/api/create-checkout" },
+    { "source": "/webhook", "destination": "/api/webhook" },
+    { "source": "/verify", "destination": "/api/verify" },
+    { "source": "/", "destination": "/public/index.html" }
+  ]
+}

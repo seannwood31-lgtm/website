@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tab Lock Pro — $2.99/month</title>
+<meta name="description" content="Unlock auto-refresh, session restore, and unlimited sportsbook locking for $2.99/month.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #060609; --surface: #0f0f16; --surface2: #18181f;
+    --border: #24242f; --accent: #ff4d00; --accent2: #ff7a3d;
+    --text: #ededf5; --muted: #64647a; --green: #00e676;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: 'Barlow', sans-serif;
+    min-height: 100vh; overflow-x: hidden;
+  }
+  body::before {
+    content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background-image:
+      linear-gradient(rgba(255,77,0,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,77,0,0.025) 1px, transparent 1px);
+    background-size: 48px 48px;
+  }
+
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(6,6,9,0.85); backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 48px; height: 64px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .nav-logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+  .logo-box {
+    width: 34px; height: 34px; background: var(--accent); border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 12px; color: #fff;
+  }
+  .logo-name { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 20px; color: var(--text); }
+  .nav-back { color: var(--muted); font-size: 14px; text-decoration: none; transition: color 0.15s; }
+  .nav-back:hover { color: var(--text); }
+
+  .page {
+    position: relative; z-index: 1;
+    min-height: 100vh; padding: 100px 48px 80px;
+    display: flex; flex-direction: column; align-items: center;
+  }
+
+  /* Glow */
+  .glow {
+    position: absolute; width: 700px; height: 700px; pointer-events: none;
+    background: radial-gradient(circle, rgba(255,77,0,0.09) 0%, transparent 65%);
+    top: -100px; left: 50%; transform: translateX(-50%);
+  }
+
+  /* Hero text */
+  .page-hero { text-align: center; margin-bottom: 56px; }
+  .page-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(255,77,0,0.08); border: 1px solid rgba(255,77,0,0.2);
+    color: var(--accent2); padding: 6px 16px; border-radius: 20px;
+    font-family: 'Barlow Condensed', sans-serif; font-size: 12px;
+    font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+    margin-bottom: 24px;
+  }
+  h1 {
+    font-family: 'Barlow Condensed', sans-serif; font-size: 72px; font-weight: 900;
+    text-transform: uppercase; line-height: 0.9; letter-spacing: -2px; margin-bottom: 20px;
+  }
+  h1 em { color: var(--accent); font-style: normal; }
+  .page-sub { font-size: 18px; color: var(--muted); max-width: 480px; margin: 0 auto; font-weight: 300; line-height: 1.65; }
+  .page-sub strong { color: var(--text); font-weight: 600; }
+
+  /* Main layout */
+  .main-layout {
+    display: flex; gap: 32px; align-items: flex-start; width: 100%; max-width: 960px;
+  }
+
+  /* Pricing card */
+  .pricing-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 16px; padding: 40px; flex: 1;
+    position: relative; overflow: hidden;
+    box-shadow: 0 40px 80px rgba(0,0,0,0.5);
+  }
+  .pricing-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+  }
+
+  .price-row { display: flex; align-items: baseline; gap: 4px; margin-bottom: 4px; }
+  .price-dollar { font-family: 'Barlow Condensed', sans-serif; font-size: 28px; font-weight: 700; color: var(--muted); }
+  .price-amount { font-family: 'Barlow Condensed', sans-serif; font-size: 72px; font-weight: 900; line-height: 1; }
+  .price-period { font-size: 18px; color: var(--muted); align-self: flex-end; padding-bottom: 8px; }
+  .price-note { font-size: 13px; color: var(--muted); margin-bottom: 32px; }
+
+  .feat-list { list-style: none; margin-bottom: 32px; display: flex; flex-direction: column; gap: 11px; }
+  .feat-list li {
+    display: flex; align-items: flex-start; gap: 12px;
+    font-size: 15px; line-height: 1.4;
+  }
+  .feat-check { color: var(--green); margin-top: 1px; flex-shrink: 0; font-size: 13px; }
+  .feat-text { flex: 1; }
+  .feat-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  .divider { height: 1px; background: var(--border); margin: 20px 0; }
+
+  .subscribe-btn {
+    display: block; width: 100%; padding: 16px; border: none; cursor: pointer;
+    background: var(--accent); color: #fff; border-radius: 10px;
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 900;
+    font-size: 18px; letter-spacing: 1px; text-transform: uppercase;
+    transition: all 0.15s; box-shadow: 0 0 40px rgba(255,77,0,0.3);
+    margin-bottom: 12px;
+  }
+  .subscribe-btn:hover:not(:disabled) { background: var(--accent2); box-shadow: 0 0 60px rgba(255,77,0,0.4); }
+  .subscribe-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+  .stripe-note {
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    font-size: 12px; color: var(--muted);
+  }
+
+  /* Side panel */
+  .side-panel { width: 320px; flex-shrink: 0; display: flex; flex-direction: column; gap: 16px; }
+
+  .side-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 24px;
+  }
+  .side-card-title {
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 14px;
+    letter-spacing: 1px; text-transform: uppercase; color: var(--muted);
+    margin-bottom: 16px;
+  }
+
+  .comparison { display: flex; flex-direction: column; gap: 8px; }
+  .comp-row { display: flex; align-items: center; justify-content: space-between; font-size: 13px; }
+  .comp-feature { color: var(--muted); }
+  .comp-vals { display: flex; gap: 20px; }
+  .comp-free { color: var(--muted); font-size: 12px; }
+  .comp-pro { color: var(--green); font-size: 12px; font-weight: 600; }
+  .comp-header { display: flex; justify-content: flex-end; gap: 20px; margin-bottom: 4px; }
+  .comp-h { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; }
+
+  .steps { display: flex; flex-direction: column; gap: 14px; }
+  .step { display: flex; gap: 12px; }
+  .step-num {
+    width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0;
+    background: rgba(255,77,0,0.1); border: 1px solid rgba(255,77,0,0.25);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 12px; color: var(--accent);
+  }
+  .step-text { font-size: 13px; color: var(--muted); line-height: 1.5; }
+  .step-text strong { color: var(--text); }
+
+  .toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: #ff3333; color: #fff; padding: 10px 22px; border-radius: 8px;
+    font-size: 14px; opacity: 0; transition: all 0.3s; pointer-events: none; z-index: 999;
+    white-space: nowrap;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  @media (max-width: 800px) {
+    nav { padding: 0 24px; }
+    .page { padding: 90px 24px 60px; }
+    h1 { font-size: 48px; }
+    .main-layout { flex-direction: column; }
+    .side-panel { width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-logo">
+    <div class="logo-box">STL</div>
+    <div class="logo-name">Tab Lock</div>
+  </a>
+  <a href="/" class="nav-back">← Back to home</a>
+</nav>
+
+<div class="page">
+  <div class="glow"></div>
+
+  <div class="page-hero">
+    <div class="page-badge">🔒 Pro Subscription</div>
+    <h1>Unlock<br><em>Tab Lock</em><br>Pro</h1>
+    <p class="page-sub">Get auto-refresh, session restore, and unlimited sportsbook locking for <strong>$2.99/month</strong>.</p>
+  </div>
+
+  <div class="main-layout">
+
+    <!-- Pricing card -->
+    <div class="pricing-card">
+      <div class="price-row">
+        <div class="price-dollar">$</div>
+        <div class="price-amount">2.99</div>
+        <div class="price-period">/ month</div>
+      </div>
+      <div class="price-note">Cancel anytime · No contracts · Instant activation</div>
+
+      <ul class="feat-list">
+        <li>
+          <span class="feat-check">✓</span>
+          <div class="feat-text">
+            <div>Unlimited sportsbook tab locking</div>
+            <div class="feat-sub">Free tier is capped at 4 books. Pro removes all limits.</div>
+          </div>
+        </li>
+        <li>
+          <span class="feat-check">✓</span>
+          <div class="feat-text">
+            <div>Auto-refresh — global + per book</div>
+            <div class="feat-sub">Keep every sportsbook live. Set 1–60 min intervals per book.</div>
+          </div>
+        </li>
+        <li>
+          <span class="feat-check">✓</span>
+          <div class="feat-text">
+            <div>Session save &amp; restore</div>
+            <div class="feat-sub">Snapshot your full layout and reload it with one click.</div>
+          </div>
+        </li>
+        <li>
+          <span class="feat-check">✓</span>
+          <div class="feat-text">
+            <div>All 14+ sportsbooks supported</div>
+          </div>
+        </li>
+        <li>
+          <span class="feat-check">✓</span>
+          <div class="feat-text">
+            <div>All future Pro features included</div>
+          </div>
+        </li>
+      </ul>
+
+      <button class="subscribe-btn" id="subscribe-btn" onclick="checkout()">
+        Subscribe — $2.99 / month
+      </button>
+      <div class="stripe-note">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        Secure checkout via Stripe · We never see your card
+      </div>
+    </div>
+
+    <!-- Side panel -->
+    <div class="side-panel">
+
+      <div class="side-card">
+        <div class="side-card-title">Free vs Pro</div>
+        <div class="comparison">
+          <div class="comp-header">
+            <span class="comp-h" style="color:var(--muted)">Free</span>
+            <span class="comp-h" style="color:var(--accent)">Pro</span>
+          </div>
+          <div class="comp-row">
+            <span class="comp-feature">Tab locking</span>
+            <div class="comp-vals"><span class="comp-free">4 books</span><span class="comp-pro">Unlimited</span></div>
+          </div>
+          <div class="comp-row">
+            <span class="comp-feature">Auto-refresh</span>
+            <div class="comp-vals"><span class="comp-free">✗</span><span class="comp-pro">✓</span></div>
+          </div>
+          <div class="comp-row">
+            <span class="comp-feature">Session restore</span>
+            <div class="comp-vals"><span class="comp-free">✗</span><span class="comp-pro">✓</span></div>
+          </div>
+          <div class="comp-row">
+            <span class="comp-feature">Color badges</span>
+            <div class="comp-vals"><span class="comp-free">✓</span><span class="comp-pro">✓</span></div>
+          </div>
+          <div class="comp-row">
+            <span class="comp-feature">All sportsbooks</span>
+            <div class="comp-vals"><span class="comp-free">✓</span><span class="comp-pro">✓</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="side-card">
+        <div class="side-card-title">How Activation Works</div>
+        <div class="steps">
+          <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-text">Subscribe below — you'll see your <strong>license key</strong> on the next page</div>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-text">Click the <strong>Tab Lock icon</strong> in Chrome → Settings</div>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-text">Paste your key and click <strong>Activate</strong> — done instantly</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="side-card" style="border-color:rgba(255,77,0,0.2);background:rgba(255,77,0,0.04)">
+        <div style="font-size:13px;color:var(--muted);line-height:1.65;">
+          💬 <strong style="color:var(--text)">Questions?</strong> Email us at
+          <a href="/cdn-cgi/l/email-protection#2d5e585d5d425f596d5442585f4942404c4443034e4240" style="color:var(--accent);text-decoration:none;"><span class="__cf_email__" data-cfemail="3d4e484d4d524f497d4452484f5952505c5453135e5250">[email&#160;protected]</span></a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  async function checkout() {
+    const btn = document.getElementById("subscribe-btn");
+    btn.disabled = true;
+    btn.textContent = "Redirecting to Stripe...";
+    try {
+      const res = await fetch("/create-checkout", { method: "POST" });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        toast("Something went wrong — please try again.");
+        btn.disabled = false;
+        btn.textContent = "Subscribe — $2.99 / month";
+      }
+    } catch {
+      toast("Network error — please try again.");
+      btn.disabled = false;
+      btn.textContent = "Subscribe — $2.99 / month";
+    }
+  }
+
+  function toast(msg) {
+    const t = document.getElementById("toast");
+    t.textCo
