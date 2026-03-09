@@ -1,3 +1,8 @@
 {
-  "version": 2
+  "version": 2,
+  "cleanUrls": true,
+  "rewrites": [
+    { "source": "/pro", "destination": "/pro.html" },
+    { "source": "/privacy", "destination": "/privacy.html" }
+  ]
 }
